@@ -1,4 +1,4 @@
-BINARIES := cat chmod chown cp echo rm touch yes simple_shell whoami clear mkdir
+BINARIES := cat chmod chown cp echo rm touch yes simple_shell whoami clear mkdir ls
 
 all: build
 	echo ""
