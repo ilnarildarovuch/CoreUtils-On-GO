@@ -6,4 +6,6 @@ Compile: ```make```;
 Clean: ```make clean```;
 Compile and run in qemu: ```build_run```
 Run in qemu: ```make qemu```
-Make bootable iso (grub is needed): ```make iso``
+Make bootable iso (grub is needed): ```make iso```
+
+![screen from screens/qemu.png](screens/qemu.png)
