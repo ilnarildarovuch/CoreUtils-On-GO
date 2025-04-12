@@ -15,10 +15,33 @@ var (
     envVars = make(map[string]string)
 )
 
-func main() {
-    fmt.Print("\033[H\033[2J") // clear screen
+func updateUptime() {
+    startTime := time.Now()
+    idleTime := 0.0
 
-	help, _ := os.ReadFile("/usr/possibilities")
+    for {
+        uptimeFile, err := os.OpenFile("/proc/uptime", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+	    fmt.Printf("Error opening uptime file: %s\n", err)
+	    return
+        }
+
+        elapsed := time.Since(startTime).Seconds()
+        _, err = uptimeFile.WriteString(fmt.Sprintf("%.1f %.1f\n", elapsed, idleTime))
+        if err != nil {
+            fmt.Printf("Error writing to uptime file: %s\n", err)
+            return
+        }
+
+        uptimeFile.Close()
+        time.Sleep(1 * time.Second)
+    }
+}
+
+func main() {
+    go updateUptime()
+    fmt.Print("\033[H\033[2J") // clear screen
+    help, _ := os.ReadFile("/usr/possibilities")
 
     sigintChan := make(chan os.Signal, 1)
     sigtstpChan := make(chan os.Signal, 1)
