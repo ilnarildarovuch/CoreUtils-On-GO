@@ -1,4 +1,4 @@
-BINARIES := cat chmod chown cp echo rm touch yes simple_shell whoami clear mkdir ls uname neofetch
+BINARIES := cat chmod chown cp echo rm touch yes sh whoami clear mkdir ls neofetch uname
 
 all: build
 	echo ""
