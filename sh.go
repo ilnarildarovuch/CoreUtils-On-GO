@@ -53,7 +53,9 @@ func main() {
 
     for {
         cwd, _ := os.Getwd()
-        fmt.Printf("default@localhost:%s$ ", cwd) // hard-coded
+        host, _ := os.Hostname()
+        
+        fmt.Printf("default@%s:%s$ ", host, cwd)
 
         scanner.Scan()
         input := scanner.Text()

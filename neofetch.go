@@ -52,7 +52,7 @@ var (
 func main() {
 	initConfig()
 	gatherInfo()
-	info.Title = fmt.Sprintf("default@%s", info.Host) //Default is hardcoded
+	info.Title = fmt.Sprintf("default@%s", info.Host) // Default is hardcoded
 	displayInfo()
 }
 

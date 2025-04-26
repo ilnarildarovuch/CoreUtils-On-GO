@@ -11,7 +11,7 @@ iso: build
 	grub-mkrescue -o bootable.iso bootable
 
 build: clean
-	for f in $(wildcard *.go); do echo $$f; GOOS=linux GOARCH=386 go build -ldflags="-s -w" $$f; done
+	for f in $(wildcard *.go); do echo $$f; GOOS=linux go build -ldflags="-s -w" $$f; done
 	cp $(BINARIES) linux/bin
 	rm -f $(BINARIES)
 	for f in $(BINARIES); do chmod 777 linux/bin/$$f; done
@@ -19,8 +19,7 @@ build: clean
 	sh make_cpio.sh
 
 clean:
-	rm -R linux/bin
-	mkdir linux/bin
+	for f in $(BINARIES); do rm -f linux/bin/$$f; done
 	echo "0" > initrd-1.0.img
 	echo "0" > bootable/boot/initrd-1.0.img
 	echo "0" > linux/usr/possibilities
@@ -31,4 +30,6 @@ clean:
 	rm bootable.iso
 
 qemu:
-	qemu-system-x86_64 -kernel vmlinuz-1 -initrd initrd-1.0.img -m 2048 -vga std -device virtio-keyboard-pci -device virtio-mouse-pci -device virtio-gpu-pci
+	qemu-system-x86_64 -kernel bootable/boot/vmlinuz-1 -initrd initrd-1.0.img -m 2048
+qemu-console:
+	qemu-system-x86_64 -kernel bootable/boot/vmlinuz-1 -initrd initrd-1.0.img -m 2048 -nographic -append 'console=ttyS0'
