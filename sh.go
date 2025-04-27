@@ -40,8 +40,7 @@ func updateUptime() {
 
 func main() {
     // only if proc is unmounted, too hacky:
-    go updateUptime()
-    fmt.Print("\033[H\033[2J") // clear screen
+    // go updateUptime()
     help, _ := os.ReadFile("/usr/possibilities")
 
     sigintChan := make(chan os.Signal, 1)
@@ -153,7 +152,7 @@ func main() {
             cmdArgs = args
         }
 
-        cmd := exec.Command("/bin/" + cmdArgs[0], cmdArgs[1:]...)
+        cmd := exec.Command(cmdArgs[0], cmdArgs[1:]...)        
         cmd.Stdout = os.Stdout
         cmd.Stderr = os.Stderr
 
