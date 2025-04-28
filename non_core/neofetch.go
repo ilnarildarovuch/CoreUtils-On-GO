@@ -84,7 +84,7 @@ func displayInfo() {
 func detectOS() string { // Ummmm...
 	switch runtime.GOOS {
 	case "linux":
-		return "Linux"
+		return "X/Linux"
 	case "darwin":
 		return "macOS"
 	case "windows":

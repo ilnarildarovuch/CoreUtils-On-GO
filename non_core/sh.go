@@ -42,6 +42,7 @@ func main() {
     // only if proc is unmounted, too hacky:
     // go updateUptime()
     help, _ := os.ReadFile("/usr/possibilities")
+    rc_message, _ := os.ReadFile("/usr/.rcm")
 
     sigintChan := make(chan os.Signal, 1)
     sigtstpChan := make(chan os.Signal, 1)
@@ -49,6 +50,8 @@ func main() {
     signal.Notify(sigtstpChan, syscall.SIGTSTP)
 
     scanner := bufio.NewScanner(os.Stdin)
+
+    fmt.Println(string(rc_message))
 
     for {
         cwd, _ := os.Getwd()
@@ -167,7 +170,9 @@ func main() {
 
         err := cmd.Start()
         if err != nil {
-            fmt.Printf("Error executing command: %s\n", err)
+            if strings.Contains(err.Error(), "no") {
+                fmt.Println(err.Error())
+            }
             continue
         }
 
@@ -184,9 +189,6 @@ func main() {
             }
         }()
 
-        err = cmd.Wait()
-        if err != nil {
-            fmt.Printf("Error executing command: %s\n", err)
-        }
+        cmd.Wait()
     }
 }

@@ -1,10 +1,5 @@
 package main
 
-/*
-#include <sys/reboot.h>
-#include <linux/sched.h>
-*/
-import "C"
 import (
 	"bufio"
 	"encoding/binary"
@@ -19,17 +14,17 @@ import (
 	"time"
 )
 
-// ████████ Конфигурация ████████
+// Config
 const (
 	INITTAB_PATH  = "/etc/inittab"
+	SYSLOG_PATH   = "/var/log/syslog" 
 	RC_DIR        = "/etc/rc.d"
 	INITCTL_FIFO  = "/run/initctl"
-	UTMP_PATH     = "/var/run/utmp"
 	CGROUP_ROOT   = "/sys/fs/cgroup"
 	RECOVERY_MODE = "recovery"
 )
 
-// ████████ Структуры данных ████████
+// Structs
 type Process struct {
 	ID        string
 	Runlevels string
@@ -88,13 +83,19 @@ func setupTTY() {
 	PrintLn("Initializing TTY")
 	syscall.Setsid()
 	syscall.Syscall(syscall.SYS_IOCTL, uintptr(0), uintptr(syscall.TIOCSCTTY), 1)
+
 	os.Setenv("PATH", os.Getenv("PATH")+":/bin")
+
+	f, _ := os.OpenFile("/proc/sys/kernel/printk", os.O_WRONLY, 0) // only critical
+	defer f.Close()
+	f.WriteString("2 0 0 0")
 }
 
 
 func checkRecoveryMode() {
 	PrintLn("Checking for recovery mode")
 	if kernelParamExists(RECOVERY_MODE) {
+		PrintLn("Entering recovery mode...")
 		recoveryMode = true
 		currentRunlevel = "1"
 		enableSingleUserMode()
@@ -352,10 +353,18 @@ func shutdown() {
 	syscall.Reboot(syscall.LINUX_REBOOT_CMD_POWER_OFF)
 }
 
+func debug(format string, a ...interface{}) {
+	f, _ := os.OpenFile(SYSLOG_PATH, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f.WriteString(fmt.Sprintf("%s %s\n", time.Now().Format(time.RFC3339), fmt.Sprintf(format, a...)))
+	defer f.Close()
+}
+
 func Printf(format string, a ...interface{}) (n int, err error) {
+	debug(format, a)
 	return fmt.Printf("[\033[32m*\033[0m] " + format, a...)
 }
 
 func PrintLn(a ...interface{}) (n int, err error) {
+	debug("", a)
 	return fmt.Println(append([]interface{}{"[\033[32m*\033[0m] "}, a...)...)
 }
