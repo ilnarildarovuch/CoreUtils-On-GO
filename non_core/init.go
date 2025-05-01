@@ -84,7 +84,7 @@ func setupTTY() {
 	syscall.Setsid()
 	syscall.Syscall(syscall.SYS_IOCTL, uintptr(0), uintptr(syscall.TIOCSCTTY), 1)
 
-	os.Setenv("PATH", os.Getenv("PATH")+":/bin")
+	os.Setenv("PATH", os.Getenv("PATH") + ":/bin:/sbin")
 
 	f, _ := os.OpenFile("/proc/sys/kernel/printk", os.O_WRONLY, 0) // only critical
 	defer f.Close()
@@ -105,7 +105,7 @@ func checkRecoveryMode() {
 func enableSingleUserMode() {
 	PrintLn("Entering single user mode")
 	// emergency shell
-	cmd := exec.Command("/bin/sh")
+	cmd := exec.Command("/bin/gsh")
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -149,7 +149,7 @@ func createNamespace(proc *Process) {
 
 // LSB (does not work)
 func executeLSB(script string, action string) error {
-	cmd := exec.Command("/bin/sh", script, action)
+	cmd := exec.Command("/bin/gsh", script, action)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setsid: true,
 	}
@@ -204,7 +204,7 @@ func parseInittabLine(line string) {
 
 func startProcess(proc *Process) {
 	PrintLn("Starting process", proc.ID)
-	cmd := exec.Command("/bin/sh", "-c", proc.Command)
+	cmd := exec.Command("/bin/gsh", "-c", proc.Command)
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setsid:     true,
 		Cloneflags: getCloneFlags(proc),
@@ -291,7 +291,7 @@ func killAllProcesses() {
 
 func startEmergencyShell() {
 	PrintLn("Starting emergency shell")
-	cmd := exec.Command("/bin/sh")
+	cmd := exec.Command("/bin/gsh")
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

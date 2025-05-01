@@ -1,4 +1,4 @@
-BINARIES := cat chmod chown cp echo rm touch yes init whoami clear mkdir ls neofetch uname sh
+BINARIES := cat chmod chown cp echo rm touch yes init whoami clear mkdir ls neofetch uname gsh
 
 all: build
 	echo ""
@@ -11,8 +11,8 @@ iso: build
 	grub-mkrescue -o bootable.iso bootable
 
 build: clean
-	for f in $(wildcard core/*.go); do echo $$f; CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w -extldflags "-static"' $$f; done
-	for f in $(wildcard non_core/*.go); do echo $$f; CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w -extldflags "-static"' $$f; done
+	for f in $(wildcard core/*.go); do echo CU GO $$f; CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w -extldflags "-static"' $$f; done
+	for f in $(wildcard non_core/*.go); do echo OT GO $$f; CGO_ENABLED=0 GOOS=linux go build -ldflags='-s -w -extldflags "-static"' $$f; done
 	
 	cp $(BINARIES) linux/bin
 	rm -f $(BINARIES)
