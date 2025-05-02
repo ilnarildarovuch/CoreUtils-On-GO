@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 	"bufio"
 	"runtime"
 	"strconv"
@@ -26,6 +27,7 @@ type SystemInfo struct {
 	Title  string
 	OS     string
 	Host   string
+	User   string
 	Kernel string
 	Uptime string
 }
@@ -52,7 +54,7 @@ var (
 func main() {
 	initConfig()
 	gatherInfo()
-	info.Title = fmt.Sprintf("default@%s", info.Host) // Default is hardcoded
+	info.Title = fmt.Sprintf("%s@%s", info.User, info.Host)
 	displayInfo()
 }
 
@@ -69,6 +71,7 @@ func initConfig() {
 func gatherInfo() {
 	info.OS = detectOS()
 	info.Host = getHost()
+	info.User = getUser()
 	info.Kernel = getKernel()
 	info.Uptime = getUptime()
 }
@@ -106,6 +109,14 @@ func getHost() string {
 		return "Unknown"
 	}
 	return hostname
+}
+
+func getUser() string {
+	current, err := user.Current()
+	if err != nil {
+		return "Unknown"
+	}
+	return current.Username
 }
 
 func getKernel() string {
